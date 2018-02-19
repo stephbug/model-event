@@ -1,0 +1,53 @@
+{
+  "name": "stephbug/model-event",
+  "description": "",
+  "type": "project",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "steph bug",
+      "email": "stephbugdev@gmail.com"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/stephbug/service-bus"
+    }
+  ],
+  "require": {
+    "php": "^7.1",
+    "illuminate/contracts": "5.6.*",
+    "illuminate/support": "5.6.*",
+    "illuminate/database": "5.6.*",
+    "beberlei/assert": "^2.7",
+    "prooph/service-bus": "^6.0",
+    "stephbug/service-bus": "dev-master"
+  },
+  "require-dev": {
+    "laravel/framework": "^5.6",
+    "phpunit/phpunit": "~6.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "StephBug\\ModelEvent\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "StephBugTest\\ModelEvent\\": "tests/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0-dev"
+    },
+	"laravel": {
+      "providers": [
+        "StephBug\\ModelEvent\\Provider\\ModelEventServiceProvider"
+      ]
+    }
+  }
+}
+
+
