@@ -6,7 +6,7 @@ namespace StephBug\ModelEvent\EventLog;
 
 use Illuminate\Database\Connection;
 use StephBug\ModelEvent\EventLog\Commander\CreateStream;
-use StephBug\ModelEvent\EventLog\Model\EloquentEventLog;
+use StephBug\ModelEvent\EventLog\Model\EventLogRepositoryModel;
 use StephBug\ModelEvent\EventLog\Stream\Stream;
 use StephBug\ModelEvent\ModelChanged;
 use StephBug\ServiceBus\Bus\CommandBus;
@@ -20,9 +20,9 @@ class EventLog implements TransactionalEventLogger
     private $connection;
 
     /**
-     * @var EloquentEventLog
+     * @var EventLogRepositoryModel
      */
-    private $model;
+    private $repository;
 
     /**
      * @var EventBus
@@ -40,12 +40,12 @@ class EventLog implements TransactionalEventLogger
     private $inTransaction = false;
 
     public function __construct(Connection $connection,
-                                EloquentEventLog $model,
+                                EventLogRepositoryModel $repository,
                                 EventBus $eventBus,
                                 CommandBus $commandBus)
     {
         $this->connection = $connection;
-        $this->model = $model;
+        $this->repository = $repository;
         $this->eventBus = $eventBus;
         $this->commandBus = $commandBus;
     }
@@ -82,7 +82,7 @@ class EventLog implements TransactionalEventLogger
             $this->eventBus->dispatch($event);
 
             $payload = [
-                'id' => $event->uuid(),
+                'id' => $event->uuid()->toString(),
                 'stream' => $streamString,
                 'stream_name' => $event->messageName(),
                 'payload' => json_encode($event->toArray()),
@@ -93,8 +93,8 @@ class EventLog implements TransactionalEventLogger
         }
     }
 
-    public function model(): EloquentEventLog
+    public function repository(): EventLogRepositoryModel
     {
-        return $this->model;
+        return $this->repository;
     }
 }

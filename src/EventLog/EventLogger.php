@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace StephBug\ModelEvent\EventLog;
 
+use StephBug\ModelEvent\EventLog\Model\EventLogRepositoryModel;
 use StephBug\ModelEvent\EventLog\Stream\Stream;
 
 interface EventLogger
 {
     public function create(Stream $stream): void;
+
+    public function repository(): EventLogRepositoryModel;
 }

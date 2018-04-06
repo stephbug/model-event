@@ -10,7 +10,7 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use StephBug\ModelEvent\EventLog\Stream\StreamName;
 
-class EloquentEventLog extends Model
+class EloquentEventLog extends Model implements EventLogModel, EventLogRepositoryModel
 {
     /**
      * @var string
@@ -37,10 +37,10 @@ class EloquentEventLog extends Model
      */
     public $timestamps = false;
 
-    public function createStream(UuidInterface $id, string $stream, string $realStreamName, string $payload, int $version): void
+    public function createStream(string $uuid, string $stream, string $realStreamName, string $payload, int $version): void
     {
         $self = new self([
-            'id' => $id,
+            'id' => $uuid,
             'stream' => $stream,
             'real_stream_name' => $realStreamName,
             'payload' => $payload,
@@ -50,7 +50,7 @@ class EloquentEventLog extends Model
         $self->save();
     }
 
-    public function eventsOfId(string $id)
+    public function eventsOfId(string $id): ?EventLogModel
     {
         return $this->newQuery()->find($id);
     }
