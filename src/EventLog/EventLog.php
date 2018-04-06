@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace StephBug\ModelEvent\EventLog;
 
 use Illuminate\Database\Connection;
+use StephBug\ModelEvent\EventLog\Commander\CreateStream;
 use StephBug\ModelEvent\EventLog\Model\EloquentEventLog;
 use StephBug\ModelEvent\EventLog\Stream\Stream;
 use StephBug\ModelEvent\ModelChanged;
+use StephBug\ServiceBus\Bus\CommandBus;
 use StephBug\ServiceBus\Bus\EventBus;
 
 class EventLog implements TransactionalEventLogger
@@ -28,15 +30,24 @@ class EventLog implements TransactionalEventLogger
     private $eventBus;
 
     /**
+     * @var CommandBus
+     */
+    private $commandBus;
+
+    /**
      * @var bool
      */
     private $inTransaction = false;
 
-    public function __construct(Connection $connection, EloquentEventLog $model, EventBus $eventBus)
+    public function __construct(Connection $connection,
+                                EloquentEventLog $model,
+                                EventBus $eventBus,
+                                CommandBus $commandBus)
     {
         $this->connection = $connection;
         $this->model = $model;
         $this->eventBus = $eventBus;
+        $this->commandBus = $commandBus;
     }
 
     public function beginTransaction(): void
@@ -70,13 +81,20 @@ class EventLog implements TransactionalEventLogger
 
             $this->eventBus->dispatch($event);
 
-            $this->model->createStream(
-                $event->uuid(),
-                $streamString,
-                $event->messageName(),
-                json_encode($event->toArray()),
-                $event->version()
-            );
+            $payload = [
+                'id' => $event->uuid(),
+                'stream' => $streamString,
+                'stream_name' => $event->messageName(),
+                'payload' => json_encode($event->toArray()),
+                'version' => $event->version()
+            ];
+
+            $this->commandBus->dispatch(new CreateStream($payload));
         }
+    }
+
+    public function model(): EloquentEventLog
+    {
+        return $this->model;
     }
 }

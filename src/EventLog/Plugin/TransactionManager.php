@@ -17,11 +17,6 @@ class TransactionManager extends AbstractPlugin
      */
     private $eventLog;
 
-    /**
-     * TransactionManager constructor.
-     *
-     * @param TransactionalEventLogger $eventLog
-     */
     public function __construct(TransactionalEventLogger $eventLog)
     {
         $this->eventLog = $eventLog;
